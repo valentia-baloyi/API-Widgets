@@ -1,0 +1,26 @@
+
+GET http://localhost:3011/api/word_game
+content-type: application/json
+{
+ "LongestWord" : "",
+ "ShortestWord" : "",
+ "sum" : 0
+}
+
+###Calculate Total Phone Bill:
+POST http://localhost:3011/api/phonebill/total
+content-type: application/json
+{
+  "billString": "call,sms,call"
+}
+
+### Get Prices of Call and SMS:
+GET http://localhost:3011/api/phonebill/prices
+
+### Set Price of Call or SMS:
+POST http://localhost:3011/api/phonebill/price
+content-type: application/json
+{
+  "type": "sms",
+  "price": 2.85
+}
