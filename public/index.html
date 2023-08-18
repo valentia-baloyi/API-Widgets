@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API Widgets</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: #333;
+      color: #fff;
+      margin: 10px 0;
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    .btn {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .btn:hover {
+      background-color: #0056b3;
+    }
+
+    p {
+      font-size: 18px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@2.8.2/dist/alpine.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="center-align"> MY API Widgets</h1>
+    <div x-data="WordGameWidget()">
+      <!-- Word Game Widget -->
+      <div class="row">
+        <div class="col s12 m12">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Word Game Widget</span>
+              <div>
+                <textarea x-model="sentence" cols="30" rows="5"></textarea>
+                <button class="btn" x-on:click="checkSentence()">Check Sentence</button>
+              </div>
+              <div>
+                <p>Longest Word: <span x-text="LongestWord"></span></p>
+                <p>Shortest Word: <span x-text="ShortestWord"></span></p>
+                <p>Word Count: <span x-text="WordCount"></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Phone Bill Widget -->
+    <div class="row">
+      <div x-data="phoneBillWidget()">
+        <div class="col s12 m8">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Total Phone Bill Widget</span>
+              <div>
+                <label for="billString">Enter bill string:</label>
+                <input type="text" id="billString" x-model="billString">
+                <button class="btn" @click="getTotalPrice()">Calculate Total</button>
+                <p x-text="totalPrice"></p>
+              </div>
+              <div>
+                <h5>Change Prices</h5>
+                <label for="callPrice">Call Price (R):</label>
+                <input type="number" id="callPrice" step="1" x-model="callPrice">
+                <button class="btn" @click="setPrice('call')">Set Call Price</button>
+                <br>
+                <label for="smsPrice">SMS Price (R):</label>
+                <input type="number" id="smsPrice" step="0.01" x-model="smsPrice">
+                <button class="btn" @click="setPrice('sms')">Set SMS Price</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Enough Airtime Widget -->
+    <div class="row">
+      <div x-data="enoughAirtimeWidget()">
+        <div class="col s12 m6">
+          <div class="card">
+            <div class="card-content">
+              <span class="card-title">Enough Airtime Widget</span>
+              <div>
+                <label for="usage">Enter usage projection:</label>
+                <input type="text" id="usage" x-model="usage">
+                <br>
+                <label for="availableAirtime">Available Airtime (R):</label>
+                <input type="number" id="availableAirtime" step="1" x-model="availableAirtime">
+                <button class="btn" @click="checkAirtime()">Check</button>
+                <p x-text="result"></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    function WordGameWidget() {
+      return {
+        sentence: '',
+        LongestWord: '',
+        ShortestWord: '',
+        WordCount: 0,
+
+        checkSentence() {
+          axios.get(`/api/word_game?sentence=${this.sentence}`)
+            .then(result => {
+              console.log(result.data);
+              this.LongestWord = result.data.LongestWord;
+              this.ShortestWord = result.data.ShortestWord;
+              this.WordCount = result.data.sum;
+            });
+        }
+      };
+    }
+    function enoughAirtimeWidget() {
+      return {
+        usage: "",
+        availableAirtime: 0,
+        result: "",
+
+        checkAirtime() {
+          axios.post("/api/enoughAirtime", { usage: this.usage, available: this.availableAirtime })
+            .then(response => {
+              this.result = 'R' + response.data.result;
+            })
+            .catch(error => {
+              console.error("Error checking airtime:", error);
+            });
+        }
+      };
+    }
+    function phoneBillWidget() {
+      return {
+        billString: "",
+        totalPrice: "",
+        callPrice: 2.75,
+        smsPrice: 0.65,
+
+        getTotalPrice() {
+          axios.post("/api/phonebill/total", { bill: this.billString })
+            .then(response => {
+              this.totalPrice = response.data.total;
+            })
+            .catch(error => {
+              console.error("Error fetching total price:", error);
+            });
+        },
+
+        setPrice(type) {
+          const price = type === "call" ? this.callPrice : this.smsPrice;
+          axios.post("/api/phonebill/prices", { type, price })
+            .then(response => {
+              console.log(response.data.message);
+            })
+            .catch(error => {
+              console.error("Error setting price:", error);
+            });
+        }
+      };
+    }
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</body>
+
+</html>
