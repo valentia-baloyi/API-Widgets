@@ -1,58 +1,56 @@
-import express from 'express';
+import express from 'express'
+import longestWord from "./Bootcamp/longestWord.js"
+import shortestWord from "./Bootcamp/shortestWord.js"
+import wordLengths from "./Bootcamp/WordLengths.js"
+import phoneBill from "./Bootcamp/totalphoneBill.js"
+import enoughAirtime from './Bootcamp/enoughAirtime.js'
 
-import longestWord from './bootcamp/LongestWord.js';
-import shortestWord from './bootcamp/ShortestWord.js';
-import wordLengths from './bootcamp/WordLengths.js';
-import phoneBill from './bootcamp/totalphoneBill.js';
-import enoughAirtime from './bootcamp/enoughAirtime.js'
 
-
-const app = express();
-app.use(express.static('public'));
-
+const app=express();
 app.use(express.json());
+app.use(express.static('public'))
 
-app.get('/api/word_game', function (req, res) {
-    const sentence = req.query.sentence;
-    if (!sentence) {
+app.get('/api/word_game',function (req,res){
+    const sentence=req.query.sentence;
+    if(!sentence){
         res.json({
-            error: 'sentence not found'
+            error:"please send in your sentence"
         })
     }
-        res.json({
-        
-            "longestWord" : longestWord(sentence),
-            "shortestWord": shortestWord(sentence),
-            "sum" : wordLengths(sentence)
-           
-    });
-  });
-
-  app.get('/api/phonebill/prices',function (req,res){
-    const bill=req.query.bill;
+   
     res.json({
-        "bill": phoneBill(bill)
+        "longestWord":longestWord(sentence),
+        "shortestWord":shortestWord(sentence),
+        "Sum":wordLengths(sentence)
+        
     })
-  })
-  
-  app.post('/api/phonebill/total',function(req,res){
+    
+})
+ app.get('/api/phonebill/prices',function (req,res){
+    const strbill=req.query.strbill;
+    res.json({
+        "bill": phoneBill(strbill)
+    })
+ })
+
+app.post('/api/phonebill/total',function(req,res){
     const bill=req.body.bill;
     res.json({
-        "status":'success',
+        "status":'Success',
         "total":phoneBill(bill)
     })
-  })
-  
-  app.post('/api/phonebill/prices',function (req,res){
+})
+
+app.post('/api/phonebill/prices',function (req,res){
     const type=req.body.type;
     const price=req.body.price;
     res.json({
         "status":"success",
         "message":`${type} was set to ${price}`
     })
-  })
-  
-  app.get('/api/enoughAirtime', (req, res) => {
+})
+
+app.get('/api/enoughAirtime', (req, res) => {
     const usage = req.query.usage;
     const available = req.query.available;
   
@@ -74,12 +72,10 @@ app.get('/api/word_game', function (req, res) {
       result : enoughAirtime(usage,available)
     });
   });
-  
-  
-  
-  let PORT = process.env.PORT || 3011;
-  
-  app.listen(PORT, function () {
-      console.log('App starting on port', PORT);
-  });
-  
+
+
+const PORT = process.env.PORT || 4002;
+app.listen(PORT,function(){
+console.log(`api on PORT ${PORT}`)
+
+})
