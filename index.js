@@ -1,9 +1,9 @@
 import express from 'express'
-import longestWord from "./Bootcamp/longestWord.js"
-import shortestWord from "./Bootcamp/shortestWord.js"
-import wordLengths from "./Bootcamp/WordLengths.js"
-import phoneBill from "./Bootcamp/totalphoneBill.js"
-import enoughAirtime from './Bootcamp/enoughAirtime.js'
+import longestWord from "./bootcamp/longestWord.js"
+import shortestWord from "./bootcamp/shortestWord.js"
+import wordLengths from "./bootcamp/WordLengths.js"
+import phoneBill from "./bootcamp/totalphoneBill.js"
+import enoughAirtime from './bootcamp/enoughAirtime.js'
 
 
 const app=express();
